@@ -1,0 +1,16 @@
+.next/
+node_modules/
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+env/
+.env
+.dbdata/
+db.sqlite3
+__init__.py
+__pycache__
+migrations/
