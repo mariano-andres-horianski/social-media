@@ -12,14 +12,15 @@ redis_client = redis.Redis(host='redis', port=6379, db=0)
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql://root:root@db/main'
-CORS(APP)
+CORS(app)
 
 
 db = SQLAlchemy(app)
 
 
-# This service will store some basic data for the posts in case that a user likes a deleted post (as you can do in Twitter if a deleted post is cached)
+# This service will store some basic data for the posts in case that a user likes a deleted post (as you can do in Twitter if a deleted post is cached).
 # Will use it to retrieve posts if the Django service stops working. Not gonna think of a leader election algorithm for now.
+# Might try to use it for a hinted handoff or delete it.
 @dataclass
 class Post(db.Model):
     id: int
