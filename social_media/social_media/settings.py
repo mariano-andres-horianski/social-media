@@ -1,5 +1,6 @@
 from pathlib import Path
 from decouple import config
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -14,6 +15,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# RabbitMQ Configuration
+RABBITMQ_URL = os.environ.get('RABBITMQ_URL', 'amqp://guest:guest@localhost:5672/')
 
 # Application definition
 

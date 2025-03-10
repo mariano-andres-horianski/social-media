@@ -62,9 +62,8 @@ def like(id):
 
         return jsonify({'message': 'Post liked'})
 
-    
-    
-
+likes_consumer = RabbitMQConsumer(like, 'likes_queue')
+likes_consumer.start()
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port=5000)

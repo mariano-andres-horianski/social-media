@@ -18,4 +18,3 @@ class Post(models.Model):
 
     def __str__(self):
         return f'Post {self.id} by {self.owner.email}'
-    
