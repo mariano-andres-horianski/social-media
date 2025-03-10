@@ -58,6 +58,7 @@ def like(id):
         db.session.add(post_like)
         db.session.commit()
         # Notify the post service that a post has been liked
+        # This probably needs a try catch
         redis_client.publish('post_likes', f'PostLiked:{id}')
 
         return jsonify({'message': 'Post liked'})
