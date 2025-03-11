@@ -1,8 +1,7 @@
-version: '3'
-
 services:
   django_app:
-    build: ./social_media
+    build: 
+      context: ./social_media
     ports:
       - "8000:8000"
     depends_on:
@@ -11,11 +10,13 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres:postgres@postgres:5432/social_media
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - REDIS_URL=redis://redis:6379/0
     volumes:
       - ./social_media:/app
 
   flask_likes:
-    build: ./social_media_likes
+    build:
+      context: ./social_media_likes
     ports:
       - "5000:5000"
     depends_on:
@@ -24,6 +25,7 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres:postgres@postgres:5432/social_media
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - REDIS_URL=redis://redis:6379/0
     volumes:
       - ./social_media_likes:/app
 
@@ -46,7 +48,14 @@ services:
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
-
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    
   postgres:
     image: postgres:13
     environment:
@@ -61,3 +70,4 @@ services:
 volumes:
   rabbitmq_data:
   postgres_data:
+  redis_data:
