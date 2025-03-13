@@ -1,29 +1,43 @@
 services:
   django_app:
-    build: 
-      context: ./social_media
+    build: ./social_media
     ports:
       - "8000:8000"
     depends_on:
-      - rabbitmq
-      - postgres
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      redis:
+        condition: service_started
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/social_media
+      - DATABASE_HOST=db
+      - DATABASE_NAME=social_media
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=root
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
       - REDIS_URL=redis://redis:6379/0
     volumes:
       - ./social_media:/app
+    command: ["./entrypoint.sh"]
 
   flask_likes:
-    build:
+    build: 
       context: ./social_media_likes
     ports:
       - "5000:5000"
     depends_on:
-      - rabbitmq
-      - postgres
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      redis:
+        condition: service_started
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/social_media
+      - DATABASE_HOST=db
+      - DATABASE_NAME=social_media
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=root
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
       - REDIS_URL=redis://redis:6379/0
     volumes:
@@ -38,9 +52,28 @@ services:
     volumes:
       - ./social_media_frontend:/app
     depends_on:
-      - django_app
-      - flask_likes
+      django_app: 
+        condition: service_started
+      flask_likes: 
+        condition: service_started
 
+  db:
+    image: mysql:8
+    environment:
+      - MYSQL_DATABASE=social_media
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_ROOT_HOST=%
+    command: --bind-address=0.0.0.0
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      
   rabbitmq:
     image: rabbitmq:3-management
     ports:
@@ -48,6 +81,7 @@ services:
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+
   redis:
     image: redis:6
     ports:
@@ -55,19 +89,8 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
-    
-  postgres:
-    image: postgres:13
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=social_media
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
 volumes:
+  mysql_data:
   rabbitmq_data:
-  postgres_data:
   redis_data:

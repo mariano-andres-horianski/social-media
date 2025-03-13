@@ -1,8 +1,13 @@
 FROM python:3.10-slim
 
-RUN apt-get update && \
-    apt-get install -y default-libmysqlclient-dev build-essential && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    netcat-openbsd \
+    default-libmysqlclient-dev \
+    pkg-config \
+    build-essential \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app
@@ -11,11 +16,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application
 COPY . .
 
-# Expose the port Django runs on
-EXPOSE 8000
+RUN chmod +x wait-for-db.sh
 
-# Command to run the application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+EXPOSE 8000
