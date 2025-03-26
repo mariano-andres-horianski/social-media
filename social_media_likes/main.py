@@ -6,6 +6,7 @@ from sqlalchemy import UniqueConstraint
 import requests
 import redis
 from consumer import RabbitMQConsumer
+
 redis_client = redis.Redis(host='redis', port=6379, db=0)
 
 app = Flask(__name__)

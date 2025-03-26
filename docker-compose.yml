@@ -51,6 +51,7 @@ services:
       - "3000:3000"
     volumes:
       - ./social_media_frontend:/app
+      - /app/node_modules
     depends_on:
       django_app: 
         condition: service_started
@@ -69,7 +70,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 5s
       timeout: 5s
       retries: 5
