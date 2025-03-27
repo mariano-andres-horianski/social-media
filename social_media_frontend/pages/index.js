@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import getLoginData from '../utils/getLoginData';
-import PostsConsumer from '../rabbitmq/consumer';
+import PostsConsumer from '../utils/rabbitmq';
 
 const HomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
